@@ -1,11 +1,11 @@
 # Build image
-FROM node:12.22-alpine AS build
+FROM node:12.22 AS build
 ARG BASE_PATH
 ARG DATABASE_TYPE
 
 ENV BASE_PATH=$BASE_PATH
-ENV DATABASE_URL "postgresql://umami:umami@db:5432/umami"
-ENV DATABASE_TYPE=$DATABASE_TYPE
+ENV DATABASE_URL="mysql://root:root@db:3306/umami?sslcert=/app/edb.pem"
+ENV DATABASE_TYPE="mysql"
 
 WORKDIR /build
 
@@ -26,7 +26,7 @@ RUN yarn next telemetry disable
 RUN yarn build
 
 # Production image
-FROM node:12.22-alpine AS production
+FROM node:12.22 AS production
 WORKDIR /app
 
 # Copy cached dependencies
@@ -39,7 +39,10 @@ COPY --from=build /build/yarn.lock /build/package.json ./
 COPY --from=build /build/.next ./.next
 COPY --from=build /build/public ./public
 
-USER node
+RUN apt update && apt install -y netcat
 
+RUN wget https://github.com/edgelesssys/era/releases/latest/download/era -q && chmod +x era && mv era /bin/era
+COPY ./entrypoint.sh /entrypoint.sh
+
+ENTRYPOINT /entrypoint.sh
 EXPOSE 3000
-CMD ["yarn", "start"]
