@@ -1,3 +1,6 @@
 #!/bin/sh
 
-exec /app/sbin/nginx -g ' error_log stderr info; daemon off;'
+cd /app
+
+gramine-sgx-get-token --output nginx.token --sig nginx.sig
+gramine-sgx nginx

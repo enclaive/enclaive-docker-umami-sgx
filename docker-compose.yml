@@ -1,21 +1,24 @@
 ---
 version: '3'
 services:
+
   umami:
     image: enclaive/umami
     environment:
       DATABASE_URL: mysql://root:root@db:3306/umami?sslcert=/app/edb.pem
       DATABASE_TYPE: mysql
     build: .
+
   db:
     image: ghcr.io/edgelesssys/edgelessdb-debug-1gb:nightly
     environment:
       OE_SIMULATION: 1
+
   nginx:
     image: enclaive/umami-nginx
     build: nginx
-    volumes:
-      - /var/run/aesmd/aesm.socket:/var/run/aesmd/aesm.socket
+    devices:
+      - "/dev/sgx_enclave:/dev/sgx_enclave"
     ports:
       - '80:80'
       - '443:443'
