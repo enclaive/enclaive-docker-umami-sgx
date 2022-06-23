@@ -1,0 +1,57 @@
+loader.entrypoint = "file:{{ gramine.libos }}"
+libos.entrypoint = "/entrypoint/sbin/nginx"
+loader.argv0_override = "/entrypoint/sbin/nginx"
+
+loader.log_level = "warning"
+
+loader.env.LD_LIBRARY_PATH = "/lib:{{ arch_libdir }}:/usr/local/lib"
+
+fs.mounts = [
+    { path = "/lib",                uri = "file:{{ gramine.runtimedir() }}" },
+    { path = "{{ arch_libdir }}",   uri = "file:{{ arch_libdir }}" },
+    { path = "/etc",                uri = "file:/etc" },
+    { path = "/entrypoint/conf",    uri = "file:/entrypoint/conf" },
+    { path = "/entrypoint/sbin",    uri = "file:/entrypoint/sbin" },
+    { path = "/entrypoint/logs",    uri = "file:/entrypoint/logs", type = "tmpfs" },
+    { path = "/entrypoint/modules", uri = "file:/entrypoint/modules" },
+
+    { path = "/entrypoint/client_body_temp", uri = "file:/entrypoint/client_body_temp", type = "tmpfs" },
+    { path = "/entrypoint/proxy_temp",       uri = "file:/entrypoint/proxy_temp",       type = "tmpfs" },
+    { path = "/entrypoint/fastcgi_temp",     uri = "file:/entrypoint/fastcgi_temp",     type = "tmpfs" },
+    { path = "/entrypoint/uwsgi_temp",       uri = "file:/entrypoint/uwsgi_temp",       type = "tmpfs" },
+    { path = "/entrypoint/scgi_temp",        uri = "file:/entrypoint/scgi_temp",        type = "tmpfs" },
+
+    { path = "/usr/share/GeoIP/",   uri = "file:/usr/share/GeoIP/" },
+]
+
+sgx.debug = false
+sgx.nonpie_binary = true
+sgx.enclave_size = "512M"
+sgx.thread_num = 4
+
+sys.enable_sigterm_injection = true
+
+# Nginx benefits from Exitless. Uncomment the below line to use it.
+sgx.rpc_thread_num = 4
+
+sgx.trusted_files = [
+  "file:{{ gramine.libos }}",
+  "file:{{ gramine.runtimedir() }}/",
+  "file:{{ arch_libdir }}/",
+  "file:/entrypoint/sbin/nginx",
+  "file:/entrypoint/conf/",
+  "file:/entrypoint/modules/",
+  "file:/etc/nsswitch.conf",
+  "file:/etc/host.conf",
+  "file:/etc/passwd",
+  "file:/usr/share/GeoIP/",
+]
+
+sgx.allowed_files = [
+  # TODO: for some reason the hash of this file changes
+  "file:/etc/group",
+
+  "file:/etc/hosts",
+  "file:/etc/resolv.conf",
+  "file:/etc/ssl/certs/ca-certificates.crt",
+]

@@ -1,0 +1,27 @@
+version: '2'
+
+services:
+  umami:
+    image: enclaive/umami-sgx
+    build: .
+    devices:
+      - "/dev/sgx/enclave:/dev/sgx/enclave"
+      - "/dev/sgx/enclave:/dev/sgx_enclave"
+      - "/dev/sgx_provision:/dev/sgx_provision"
+
+  db:
+    image: ghcr.io/edgelesssys/edgelessdb-sgx-1gb
+    environment:
+      OE_SIMULATION: 1
+
+  nginx:
+    image: enclaive/umami-sgx/nginx
+    build: nginx
+    devices:
+      - "/dev/sgx/enclave:/dev/sgx/enclave"
+      - "/dev/sgx/enclave:/dev/sgx_enclave"
+      - "/dev/sgx_provision:/dev/sgx_provision"
+    ports:
+      - '80:80'
+      - '443:443'
+

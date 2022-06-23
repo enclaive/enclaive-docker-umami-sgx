@@ -1,0 +1,55 @@
+loader.entrypoint = "file:{{ gramine.libos }}"
+libos.entrypoint = "/usr/bin/node"
+
+loader.log_level = "debug"
+
+loader.env.LD_LIBRARY_PATH = "/lib:{{ arch_libdir }}:/usr/local/lib"
+
+loader.env.DATABASE_URL = "{{ database_url }}"
+loader.env.HASH_SALT = "c0be03f4e9c904e66eeb13ed7fad0c7d"
+loader.env.BASE_PATH = "{{ base_path }}"
+loader.env.ADMIN_PASSWORD = "{{ admin_password }}"
+
+loader.argv_src_file = "file:./umami_trusted_argv"
+
+# Node.js requires eventfd2() emulation
+sys.insecure__allow_eventfd = true
+
+fs.mounts = [
+  { uri = "file:/tmp", path="/tmp", type = "tmpfs" },
+  { uri = "file:{{ gramine.runtimedir() }}", path = "/lib" },
+  { uri = "file:{{ arch_libdir }}", path = "{{ arch_libdir }}" },
+  { uri = "file:/etc", path = "/etc" },
+  { uri = "file:/app", path = "/app" },
+  { uri = "file:/usr/bin", path = "/usr/bin" },
+]
+
+sgx.debug = false
+sgx.nonpie_binary = true
+sgx.enclave_size = "2G"
+sgx.thread_num = 24
+
+sgx.trusted_files = [
+  "file:{{ gramine.libos }}",
+  "file:{{ gramine.runtimedir() }}/",
+  "file:{{ arch_libdir }}/",
+
+  "file:/usr/bin/node",
+  "file:./.next/standalone/",
+  "file:./umami_trusted_argv",
+
+  "file:/etc/nsswitch.conf",
+  "file:/etc/host.conf",
+
+  "file:/etc/passwd",
+  "file:/etc/os-release",
+
+  "file:/etc/localtime",
+]
+
+sgx.allowed_files = [
+  "file:/app/edb.pem",
+  "file:/etc/hosts",
+  "file:/etc/resolv.conf",
+  "file:/etc/ssl/certs/ca-certificates.crt",
+]
