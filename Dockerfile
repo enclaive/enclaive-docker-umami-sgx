@@ -41,16 +41,15 @@ ARG AdminPassword="umami"
 ARG BasePath=""
 ARG DatabaseUrl="mysql://root:root@db:3306/umami?sslcert=/app/edb.pem"
 
-RUN gramine-sgx-gen-private-key
-RUN gramine-argv-serializer "/usr/bin/node" "./.next/standalone/server.js" > ./umami_trusted_argv
-RUN gramine-manifest -Darch_libdir=/lib/x86_64-linux-gnu \
-    -Ddatabase_url="${DatabaseUrl}" \
-    -Dbase_path="${BasePath}" \
-    -Dadmin_password="${AdminPassword}" \
-    umami.manifest.template umami.manifest
-RUN gramine-sgx-sign --manifest umami.manifest --output umami.manifest.sgx
-RUN gramine-sgx-get-token -s umami.sig -o umami.token
+RUN gramine-sgx-gen-private-key \
+    && gramine-argv-serializer "/usr/bin/node" "./.next/standalone/server.js" > ./umami_trusted_argv \
+    && gramine-manifest -Darch_libdir=/lib/x86_64-linux-gnu \
+        -Ddatabase_url="${DatabaseUrl}" \
+        -Dbase_path="${BasePath}" \
+        -Dadmin_password="${AdminPassword}" \
+        umami.manifest.template umami.manifest \
+    && gramine-sgx-sign --manifest umami.manifest --output umami.manifest.sgx \
+    && gramine-sgx-get-token -s umami.sig -o umami.token
 
 EXPOSE 3000
-
 ENTRYPOINT /entrypoint.sh
