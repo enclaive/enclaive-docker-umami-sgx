@@ -20,7 +20,7 @@ RUN cp -r ./.next/static/ ./.next/standalone/.next/ \
     && cp -r ./public/ ./.next/standalone/
 
 # final image
-FROM enclaive/gramine-os:latest
+FROM enclaive/gramine-os:jammy-33576d39
 
 RUN apt-get update \
     && apt-get install -y nodejs netcat wget curl patch \
