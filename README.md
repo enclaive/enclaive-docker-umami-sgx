@@ -42,7 +42,8 @@ docker compose up -d
 <!-- INTRODCUTION -->
 ## What is umami and SGX?
 
-Umami is an open source, privacy-focused alternative to Google Analytics
+> Umami is an open source, privacy-focused alternative to Google Analytics
+
 [Overview of umami](https://umami.is/)
 
 > Intel Security Guard Extension (SGX) delivers advanced hardware and RAM security encryption features, so called enclaves, in order to isolate code and data that are specific to each application. When data and application code run in an enclave additional security, privacy and trust guarantees are given, making the container an ideal choice for (untrusted) cloud environments.
