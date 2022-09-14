@@ -1,27 +1,28 @@
 loader.entrypoint = "file:{{ gramine.libos }}"
-libos.entrypoint = "/usr/bin/node"
+libos.entrypoint = "/app/node"
 
-loader.log_level = "debug"
+loader.log_level = "error"
+#loader.log_file = "debug/log.txt"
 
-loader.env.LD_LIBRARY_PATH = "/lib:{{ arch_libdir }}:/usr/local/lib"
+loader.env.LD_LIBRARY_PATH = "/lib:{{ arch_libdir }}"
 
 loader.env.DATABASE_URL = "{{ database_url }}"
 loader.env.HASH_SALT = "c0be03f4e9c904e66eeb13ed7fad0c7d"
 loader.env.BASE_PATH = "{{ base_path }}"
 loader.env.ADMIN_PASSWORD = "{{ admin_password }}"
 
-loader.argv_src_file = "file:./umami_trusted_argv"
+loader.argv_src_file = "file:/app/umami_trusted_argv"
 
 # Node.js requires eventfd2() emulation
 sys.insecure__allow_eventfd = true
 
 fs.mounts = [
-  { uri = "file:/tmp", path="/tmp", type = "tmpfs" },
-  { uri = "file:{{ gramine.runtimedir() }}", path = "/lib" },
-  { uri = "file:{{ arch_libdir }}", path = "{{ arch_libdir }}" },
-  { uri = "file:/etc", path = "/etc" },
-  { uri = "file:/app", path = "/app" },
-  { uri = "file:/usr/bin", path = "/usr/bin" },
+    { path = "/tmp",                uri = "file:/tmp", type = "tmpfs" },
+    { path = "/etc",                uri = "file:/etc" },
+    { path = "/usr",                uri = "file:/usr" },
+    { path = "/lib",                uri = "file:{{ gramine.runtimedir() }}" },
+    { path = "{{ arch_libdir }}",   uri = "file:{{ arch_libdir }}" },
+    { path = "/app",                uri = "file:/app" },
 ]
 
 sgx.debug = false
@@ -34,22 +35,21 @@ sgx.trusted_files = [
   "file:{{ gramine.runtimedir() }}/",
   "file:{{ arch_libdir }}/",
 
-  "file:/usr/bin/node",
-  "file:./.next/standalone/",
-  "file:./umami_trusted_argv",
+  "file:/app/node",
+  "file:/app/.next/standalone/",
+  "file:/app/umami_trusted_argv",
 
+  "file:/usr/share/zoneinfo/",
+
+  "file:/etc/ssl/openssl.cnf",
   "file:/etc/nsswitch.conf",
   "file:/etc/host.conf",
-
   "file:/etc/passwd",
   "file:/etc/os-release",
-
   "file:/etc/localtime",
 ]
 
 sgx.allowed_files = [
-  "file:/app/edb.pem",
   "file:/etc/hosts",
   "file:/etc/resolv.conf",
-  "file:/etc/ssl/certs/ca-certificates.crt",
 ]

@@ -8,11 +8,19 @@ services:
       - "/dev/sgx/enclave:/dev/sgx/enclave"
       - "/dev/sgx/enclave:/dev/sgx_enclave"
       - "/dev/sgx_provision:/dev/sgx_provision"
+#    volumes:
+#      - "./debug/:/app/debug/"
 
-  db:
-    image: ghcr.io/edgelesssys/edgelessdb-sgx-1gb
-    environment:
-      OE_SIMULATION: 1
+  mariadb:
+    image: enclaive/umami-sgx/mariadb
+    build: mariadb
+    volumes:
+      - type: volume
+        target: /data
+    devices:
+      - "/dev/sgx/enclave:/dev/sgx/enclave"
+      - "/dev/sgx/enclave:/dev/sgx_enclave"
+      - "/dev/sgx_provision:/dev/sgx_provision"
 
   nginx:
     image: enclaive/umami-sgx/nginx
